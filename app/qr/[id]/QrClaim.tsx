@@ -1,0 +1,161 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import Panel from "@/components/Panel";
+import SpaceBg from "@/components/SpaceBg";
+import {
+  isValidQrId,
+  label,
+  markQrUsed,
+  minigameFor,
+  type MinigameType,
+} from "@/lib/config";
+import { earnPiece, fetchPieces } from "@/lib/supabase";
+import MazeGame from "@/minigames/MazeGame";
+import MemoryFlip from "@/minigames/MemoryFlip";
+import SequenceTap from "@/minigames/SequenceTap";
+import SlidingPuzzle from "@/minigames/SlidingPuzzle";
+
+type View =
+  | "loading"
+  | "invalid"
+  | "locked"
+  | "minigame"
+  | "claiming"
+  | "success";
+
+const GAME_LABEL: Record<MinigameType, string> = {
+  sliding: "SLIDING PUZZLE",
+  memory: "MEMORY FLIP",
+  sequence: "SEQUENCE TAP",
+  maze: "MAZE",
+};
+
+function Blink({ text }: { text: string }) {
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <span className="h-3 w-3 bg-primary animate-blink" />
+      <p className="text-[10px] uppercase tracking-[0.35em] text-dim">{text}</p>
+    </div>
+  );
+}
+
+/** The phone page for one printed code: claim, minigame, locked or success. */
+export default function QrClaim({ id }: { id: string }) {
+  const qrId = Number(id);
+  const game = minigameFor(qrId);
+  const [view, setView] = useState<View>("loading");
+
+  const claim = useCallback(async () => {
+    setView("claiming");
+    await earnPiece(qrId);
+    markQrUsed(qrId);
+    setView("success");
+  }, [qrId]);
+
+  useEffect(() => {
+    if (!isValidQrId(qrId)) {
+      setView("invalid");
+      return;
+    }
+
+    let cancelled = false;
+    setView("loading");
+
+    (async () => {
+      const rows = await fetchPieces();
+      if (cancelled) return;
+      const row = rows.find((piece) => piece.id === qrId);
+
+      // A claimed piece is claimed for everyone — show the locked screen.
+      if (row?.earned) {
+        setView("locked");
+        return;
+      }
+      if (game) {
+        setView("minigame");
+        return;
+      }
+      await claim();
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [qrId, game, claim]);
+
+  return (
+    <SpaceBg className="items-center justify-center p-4">
+      <div className="w-full max-w-[min(94vw,94vh,520px)]">
+        <Panel
+          label={`QR ${label(qrId)} // PROTOCOL`}
+          bodyClassName={
+            view === "minigame" ? "p-4" : "aspect-square p-6 flex items-center"
+          }
+        >
+          {view === "loading" ? <Blink text="LINKING" /> : null}
+
+          {view === "claiming" ? <Blink text="TRANSMITTING PIECE" /> : null}
+
+          {view === "invalid" ? (
+            <div className="flex flex-col items-center gap-4 text-center">
+              <span className="flex h-20 w-20 items-center justify-center border border-danger text-4xl text-danger">
+                ✕
+              </span>
+              <p className="text-[10px] uppercase tracking-[0.35em] text-danger">
+                STATUS: UNKNOWN CODE
+              </p>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-dim">
+                USE ONE OF THE 9 PRINTED CODES
+              </p>
+            </div>
+          ) : null}
+
+          {view === "locked" ? (
+            <div className="flex flex-col items-center gap-5 text-center">
+              <p className="text-[10px] uppercase tracking-[0.35em] text-danger">
+                STATUS: CLAIMED
+              </p>
+              <span className="flex h-24 w-24 items-center justify-center border border-danger text-5xl text-danger">
+                ✕
+              </span>
+              <p className="text-sm uppercase tracking-[0.3em] text-ink">
+                PIECE ALREADY ACTIVE
+              </p>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-dim">
+                PLEASE CLOSE THIS TAB
+              </p>
+            </div>
+          ) : null}
+
+          {view === "success" ? (
+            // two lines only — verified, then the action
+            <div className="flex flex-col items-center gap-8 text-center">
+              <span className="flex h-24 w-24 items-center justify-center border border-success text-5xl text-success glow-green">
+                ✓
+              </span>
+              <p className="text-[clamp(1.05rem,5vw,1.7rem)] uppercase leading-tight tracking-[0.2em] text-success text-glow-green">
+                QR {label(qrId)} VERIFIED
+              </p>
+              <p className="text-[clamp(0.9rem,4vw,1.3rem)] uppercase leading-tight tracking-[0.2em] text-dim">
+                PLEASE CLOSE THIS TAB
+              </p>
+            </div>
+          ) : null}
+
+          {view === "minigame" && game ? (
+            <div className="w-full">
+              <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-secondary">
+                {GAME_LABEL[game]} // SOLVE TO UNLOCK PIECE {label(qrId)}
+              </p>
+              {game === "sliding" ? <SlidingPuzzle onWin={claim} /> : null}
+              {game === "memory" ? <MemoryFlip onWin={claim} /> : null}
+              {game === "sequence" ? <SequenceTap onWin={claim} /> : null}
+              {game === "maze" ? <MazeGame onWin={claim} qrId={qrId} /> : null}
+            </div>
+          ) : null}
+        </Panel>
+      </div>
+    </SpaceBg>
+  );
+}

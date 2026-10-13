@@ -1,4 +1,4 @@
-import { PUZZLE_IMAGE } from "./config";
+import { PUZZLE_IMAGE, siteUrl } from "./config";
 
 /* ------------------------------------------------------------------ *
  * Jigsaw geometry.
@@ -168,7 +168,7 @@ export function getPieceSVG(index: number, size: number, uid = ""): string {
     )}" shape-rendering="geometricPrecision">`,
     `<defs><clipPath id="${clipId}"><path d="${d}"/></clipPath></defs>`,
     `<g clip-path="url(#${clipId})">`,
-    `<image href="${PUZZLE_IMAGE}" x="${fmt(-col)}" y="${fmt(-row)}" width="${GRID}" height="${GRID}" preserveAspectRatio="none"/>`,
+    `<image href="${siteUrl(PUZZLE_IMAGE)}" x="${fmt(-col)}" y="${fmt(-row)}" width="${GRID}" height="${GRID}" preserveAspectRatio="none"/>`,
     `</g>`,
     // flat cyan hairline: outlines the piece and covers clip seams
     `<path d="${d}" fill="none" stroke="#22D3EE" stroke-width="0.005"/>`,

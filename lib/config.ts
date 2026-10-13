@@ -4,7 +4,22 @@
  * Everything a fest organiser might want to tweak lives here.
  */
 
-/** The square puzzle artwork. Swap the file OR point this at a new path. */
+/**
+ * Deploy prefix. GitHub Pages serves a project site from
+ * `/repo/`, so every absolute URL is built with `siteUrl()` /
+ * `assetUrl()`. It is empty locally and for any root-domain host.
+ * The workflow in .github/workflows/nextjs.yml sets it at build time.
+ */
+export const BASE_PATH = (
+  process.env.NEXT_PUBLIC_BASE_PATH ?? ""
+).replace(/\/+$/, "");
+
+/** Prefix a site-absolute path ("/stage") for the current host. */
+export function siteUrl(path: string): string {
+  return `${BASE_PATH}${path}`;
+}
+
+/** The puzzle artwork. Swap the file OR point this at a new path. */
 export const PUZZLE_IMAGE = "/puzzle/base.jpg";
 
 /** QR ids that are gated behind a minigame. Everything else awards instantly. */
@@ -41,7 +56,8 @@ export function isValidQrId(id: number): boolean {
 
 /** Absolute path of a QR page — used for the printed codes. */
 export function qrPath(id: number): string {
-  return `/qr/${id}`;
+  // Trailing slash keeps static hosts (GitHub Pages) on the directory URL.
+  return siteUrl(`/qr/${id}/`);
 }
 
 export function label(n: number): string {

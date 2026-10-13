@@ -13,6 +13,7 @@ import {
   minigameFor,
   qrPath,
   readSessionStamp,
+  siteUrl,
   writeSessionStamp,
 } from "@/lib/config";
 import {
@@ -173,7 +174,7 @@ export default function AdminPage() {
               START NEW TEAM
             </TerminalButton>
             <TerminalButton
-              onClick={() => window.open("/stage", "_blank", "noopener")}
+              onClick={() => window.open(siteUrl("/stage/"), "_blank", "noopener")}
             >
               OPEN STAGE
             </TerminalButton>

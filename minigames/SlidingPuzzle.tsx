@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import TerminalButton from "@/components/TerminalButton";
-import { PUZZLE_IMAGE } from "@/lib/config";
+import { PUZZLE_IMAGE, siteUrl } from "@/lib/config";
 
 const SIZE = 3;
 const BLANK = SIZE * SIZE - 1;
@@ -93,7 +93,7 @@ export default function SlidingPuzzle({ onWin }: { onWin: () => void }) {
                   style={{
                     gridRow: Math.floor(slot / SIZE) + 1,
                     gridColumn: (slot % SIZE) + 1,
-                    backgroundImage: `url(${PUZZLE_IMAGE})`,
+                    backgroundImage: `url(${siteUrl(PUZZLE_IMAGE)})`,
                     backgroundSize: "300% 300%",
                     backgroundPosition: `${(tile % SIZE) * 50}% ${
                       Math.floor(tile / SIZE) * 50
