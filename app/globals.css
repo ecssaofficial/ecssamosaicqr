@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background-color: #050810;
+}
+
+body {
+  color: #e2e8f0;
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+/* SQUARE CORNERS ONLY — a rounded corner cannot appear anywhere. */
+* {
+  border-radius: 0 !important;
+}
+
+button {
+  font-family: inherit;
+}
+
+/*
+ * FLAT PALETTE ONLY: every fill, border and text colour in this UI is one
+ * solid palette value (#050810, #0B1220, #22D3EE, #8B5CF6, #22C55E, #EF4444,
+ * #E2E8F0, #64748B, #052E16, black, white). No tints, no shades.
+ * NO GRADIENTS are used anywhere (gradient utilities are disabled in the
+ * Tailwind config).
+ *
+ * Alpha appears in exactly one place: soft glow shadows below, which are a
+ * light effect rather than a colour fill.
+ */
+@layer utilities {
+  .glow {
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.1);
+  }
+  .glow-cyan {
+    box-shadow: 0 0 24px rgba(34, 211, 238, 0.28);
+  }
+  .glow-green {
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+  }
+  .text-glow-cyan {
+    text-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
+  }
+  .text-glow-green {
+    text-shadow: 0 0 26px rgba(34, 197, 94, 0.55);
+  }
+  .no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+@keyframes orbit-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.15;
+  }
+}
+
+.animate-blink {
+  animation: orbit-blink 1s steps(1, end) infinite;
+}
