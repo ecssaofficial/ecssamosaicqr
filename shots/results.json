@@ -1,0 +1,140 @@
+[
+  {
+    "name": "home-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "stage-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "qr1-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "qr2-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "qr3-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "qr4-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "qr5-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "qr6-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "qr7-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "qr8-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "qr9-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  },
+  {
+    "name": "home-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "stage-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "qr1-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "qr2-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "qr3-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "qr4-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "qr5-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "qr6-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "qr7-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "qr8-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "qr9-mobile",
+    "scrollW": 390,
+    "innerW": 390,
+    "overflow": false
+  },
+  {
+    "name": "stage-win-desktop",
+    "scrollW": 1440,
+    "innerW": 1440,
+    "overflow": false
+  }
+]

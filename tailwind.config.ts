@@ -14,6 +14,11 @@ import type { Config } from "tailwindcss";
  *   2. No coloured shadows or glows — depth comes from borders and tone.
  *   3. Square corners only: every radius utility resolves to 0.
  *   4. Hierarchy comes from size, weight and opacity — never colour.
+ *
+ * Framework defaults that would otherwise leak a blue tint into the emitted
+ * CSS (preflight border colour, placeholder colour, default ring colour) are
+ * overridden to neutral values below. Nothing here renders a ring or an
+ * input, but this keeps the built stylesheet inside the monochrome palette.
  */
 const config: Config = {
   content: [
@@ -28,6 +33,18 @@ const config: Config = {
         panel: "#0A0A0A", // instrument faceplate surface
         ink: "#F5F5F5", // primary text + inverted surfaces
         danger: "#FF3B30", // locked / error only
+        gray: {
+          // preflight's placeholder colour — neutral, not blue-gray
+          400: "#F5F5F5",
+        },
+      },
+      // preflight's default border colour (#e5e7eb, blue-tinted) -> neutral
+      borderColor: {
+        DEFAULT: "#F5F5F5",
+      },
+      // Tailwind's default ring colour (blue-500 @ 50%) -> neutral
+      ringColor: {
+        DEFAULT: "#FFFFFF",
       },
       fontFamily: {
         sans: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],

@@ -117,19 +117,21 @@ become scannable again for the next team.
 
 ## 4. Swapping the puzzle image
 
-The placeholder in `public/puzzle/base.jpg` is a generated space scene
+**Main jigsaw artwork:** `public/puzzle/final.png` — a generated space scene
 (planet, ring, grid, stars — no text). To use your own art:
 
-1. Drop a **square** JPEG/PNG into `public/puzzle/` (e.g. `college.jpg`).
-2. Either keep the name `base.jpg`, or change one constant in
+1. Drop a **square** PNG into `public/puzzle/` (e.g. `college.png`).
+   JPEGs are converted to PNG and the original JPG is deleted — this project
+   ships no `.jpg` files.
+2. Either keep the name `final.png`, or change one constant in
    [`lib/config.ts`](lib/config.ts):
 
 ```ts
-export const PUZZLE_IMAGE = "/puzzle/college.jpg";
+export const PUZZLE_IMAGE = "/puzzle/college.png";
 ```
 
-That constant feeds the board, the tray thumbnails, the drag ghost and the
-QR-2 sliding puzzle tiles, so a single edit re-skins the whole game. Busy,
+That constant feeds the board ghost, the tray thumbnails, the drag ghost and
+the jigsaw pieces, so a single edit re-skins the whole game. Busy,
 high-contrast images with an obvious orientation make the jigsaw easier to
 solve than flat/blurry ones.
 
@@ -138,7 +140,7 @@ solve than flat/blurry ones.
 ## 5. Printing the QR codes
 
 1. Open `/` on the final host URL.
-2. Each of the 9 cells shows a mono caption — `QR 02 // SLIDING` for
+2. Each of the 9 cells shows a mono caption — `QR 02 // INTRUDER` for
    QR 2/4/6/8, `QR 01 // DIRECT` for the rest.
 3. Click the **↓** button → a `orbit-qr-0n.png` (1000×1000, print-ready:
    black modules on white with an 8% quiet zone) is downloaded.
@@ -153,14 +155,22 @@ solve than flat/blurry ones.
 
 ## 6. Minigames (QR 2 / 4 / 6 / 8)
 
+Logic and level design ported from the four standalone
+[Project Hail Mary](https://github.com/) HTML games, re-skinned to the
+cockpit: flat monochrome, hairlines, square corners, mono labels. The
+original audio layer and the coloured HUD are dropped.
+
 | QR | File | Game |
 | -- | ---- | ---- |
-| 2  | [`minigames/SlidingPuzzle.tsx`](minigames/SlidingPuzzle.tsx) | 3×3 sliding tiles cut from the puzzle image (always dealt solvable) |
-| 4  | [`minigames/MemoryFlip.tsx`](minigames/MemoryFlip.tsx) | 4×4 memory flip, 8 geometric glyph pairs |
-| 6  | [`minigames/SequenceTap.tsx`](minigames/SequenceTap.tsx) | watch a 5-pad sequence, repeat it (wrong pad = replay, never locked) |
-| 8  | [`minigames/MazeGame.tsx`](minigames/MazeGame.tsx) | 10×10 maze, tap or arrow buttons, deterministic layout per QR |
+| 2  | [`minigames/IntruderScan.tsx`](minigames/IntruderScan.tsx) | **Identify the Alien Intruder** — six glyphs built from the same five properties; exactly one deviates. Select it and confirm. Positions reshuffle per session; the answer never changes. |
+| 4  | [`minigames/AlienSignal.tsx`](minigames/AlienSignal.tsx) | **Decode the Alien Signal** — a word is dealt from a fixed 32-word pool and mapped to alien glyphs, plus 0–2 decoy glyphs. Type what the ciphertext decodes to. |
+| 6  | [`minigames/Transmission.tsx`](minigames/Transmission.tsx) | **Decode the Corrupted Transmission** — stage 1 unscrambles six fixed anagrams; stage 2 reorders the six words into the sentence. Two hints, no timers. |
+| 8  | [`minigames/CircuitGrid.tsx`](minigames/CircuitGrid.tsx) | **Repair the Energy Circuit** — a fixed 3×3 board of wires with fixed starting rotations. Tap to rotate, then trace power from SOURCE to RECEIVER. |
 
-All four have infinite retries and a `RESET` / `REPLAY` control.
+QR 6 and QR 8 are fully deterministic — every player sees the same puzzle.
+QR 2 and QR 4 shuffle per session without ever changing what counts as a
+correct answer. All four have infinite retries, and every deal is
+guaranteed solvable.
 
 ---
 
@@ -192,9 +202,12 @@ app/qr/[id]/page.tsx    phone claim page  (/qr/1…9)
 components/SpaceBg.tsx  starfield + base layout wrapper
 components/Panel.tsx    square panel
 components/TerminalButton.tsx
-lib/config.ts           puzzle image, QR→minigame map, session helpers
+lib/config.ts           main puzzle image, QR→minigame map, session helpers
 lib/supabase.ts         client, realtime subscription, row helpers
 lib/jigsaw.ts           deterministic jigsaw geometry + getPieceSVG()
-minigames/*.tsx         the four minigames
-public/puzzle/base.jpg  placeholder artwork
+minigames/IntruderScan  QR 02  identify the alien intruder
+minigames/AlienSignal   QR 04  decode the alien signal
+minigames/Transmission  QR 06  decode the corrupted transmission
+minigames/CircuitGrid   QR 08  repair the energy circuit
+public/puzzle/final.png main jigsaw artwork (stage ghost + 9 pieces)
 ```
