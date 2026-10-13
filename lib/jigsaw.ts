@@ -157,7 +157,6 @@ export function pieceBoxOffset(cellPx: number): number {
  * `uid` keeps the clipPath ids unique when the same piece is on screen twice.
  */
 export function getPieceSVG(index: number, size: number, uid = ""): string {
-  const { row, col } = pieceRowCol(index);
   const d = getPiecePath(index);
   const clipId = `orbit-clip-${index}-${uid || "x"}`;
   const box = fmt(pieceBoxPx(size));
@@ -168,7 +167,13 @@ export function getPieceSVG(index: number, size: number, uid = ""): string {
     )}" shape-rendering="geometricPrecision">`,
     `<defs><clipPath id="${clipId}"><path d="${d}"/></clipPath></defs>`,
     `<g clip-path="url(#${clipId})">`,
-    `<image href="${siteUrl(PUZZLE_IMAGE)}" x="${fmt(-col)}" y="${fmt(-row)}" width="${GRID}" height="${GRID}" preserveAspectRatio="none"/>`,
+    // The image spans the whole board in the SAME absolute cell units the
+    // path and viewBox use: [0, GRID] x [0, GRID]. Slicing then falls out
+    // of the geometry — slot index `index` -> (row, col) -> cell
+    // [col, col+1] x [row, row+1] -> source rect (col/3, row/3, 1/3, 1/3).
+    // Offsetting x/y here by -col/-row would sample (2*col/3, 2*row/3)
+    // instead and push the far column/row off the image entirely.
+    `<image href="${siteUrl(PUZZLE_IMAGE)}" x="0" y="0" width="${GRID}" height="${GRID}" preserveAspectRatio="none"/>`,
     `</g>`,
     // flat hairline outline (currentColor): white/40 at rest, solid white
     // while dragging, red for one beat on a wrong drop — and it covers

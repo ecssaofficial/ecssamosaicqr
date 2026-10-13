@@ -11,10 +11,10 @@ import {
   type MinigameType,
 } from "@/lib/config";
 import { earnPiece, fetchPieces } from "@/lib/supabase";
-import MazeGame from "@/minigames/MazeGame";
-import MemoryFlip from "@/minigames/MemoryFlip";
-import SequenceTap from "@/minigames/SequenceTap";
-import SlidingPuzzle from "@/minigames/SlidingPuzzle";
+import IntruderScan from "@/minigames/IntruderScan";
+import AlienSignal from "@/minigames/AlienSignal";
+import Transmission from "@/minigames/Transmission";
+import CircuitGrid from "@/minigames/CircuitGrid";
 
 type View =
   | "loading"
@@ -25,10 +25,10 @@ type View =
   | "success";
 
 const GAME_LABEL: Record<MinigameType, string> = {
-  sliding: "SLIDING PUZZLE",
-  memory: "MEMORY FLIP",
-  sequence: "SEQUENCE TAP",
-  maze: "MAZE",
+  intruder: "INTRUDER SCAN",
+  signal: "ALIEN SIGNAL",
+  transmission: "TRANSMISSION",
+  circuit: "CIRCUIT REPAIR",
 };
 
 function Blink({ text }: { text: string }) {
@@ -154,10 +154,10 @@ export default function QrClaim({ id }: { id: string }) {
               <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-white/45">
                 {GAME_LABEL[game]} // SOLVE TO UNLOCK PIECE {label(qrId)}
               </p>
-              {game === "sliding" ? <SlidingPuzzle onWin={claim} /> : null}
-              {game === "memory" ? <MemoryFlip onWin={claim} /> : null}
-              {game === "sequence" ? <SequenceTap onWin={claim} /> : null}
-              {game === "maze" ? <MazeGame onWin={claim} qrId={qrId} /> : null}
+              {game === "intruder" ? <IntruderScan onWin={claim} /> : null}
+              {game === "signal" ? <AlienSignal onWin={claim} /> : null}
+              {game === "transmission" ? <Transmission onWin={claim} /> : null}
+              {game === "circuit" ? <CircuitGrid onWin={claim} /> : null}
             </div>
           ) : null}
         </Panel>

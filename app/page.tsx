@@ -7,6 +7,7 @@ import SpaceBg from "@/components/SpaceBg";
 import TerminalButton from "@/components/TerminalButton";
 import {
   ALL_PIECE_IDS,
+  MINIGAME_CAPTION,
   TOTAL_PIECES,
   formatStamp,
   label,
@@ -194,7 +195,8 @@ export default function AdminPage() {
                     )}
                   </div>
                   <p className="mt-3 w-full text-center font-mono text-[9px] uppercase tracking-[0.2em] text-white/45">
-                    QR {label(id)} // {game ? game.toUpperCase() : "DIRECT"}
+                    QR {label(id)} //{" "}
+                    {game ? MINIGAME_CAPTION[game] : "DIRECT"}
                   </p>
                   <TerminalButton
                     className="mt-3 h-7 w-7 px-0 py-0 text-[12px]"

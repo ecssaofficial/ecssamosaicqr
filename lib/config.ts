@@ -19,17 +19,33 @@ export function siteUrl(path: string): string {
   return `${BASE_PATH}${path}`;
 }
 
-/** The puzzle artwork. Swap the file OR point this at a new path. */
-export const PUZZLE_IMAGE = "/puzzle/base.jpg";
+/**
+ * The main jigsaw artwork — the stage ghost image and the 9 board pieces.
+ * Square PNG.
+ */
+export const PUZZLE_IMAGE = "/puzzle/final.png";
+
+/** Short caption for the admin QR grid: `QR 02 // INTRUDER`. */
+export const MINIGAME_CAPTION: Record<MinigameType, string> = {
+  intruder: "INTRUDER",
+  signal: "SIGNAL",
+  transmission: "DECODE",
+  circuit: "CIRCUIT",
+};
 
 /** QR ids that are gated behind a minigame. Everything else awards instantly. */
-export type MinigameType = "sliding" | "memory" | "sequence" | "maze";
+export type MinigameType = "intruder" | "signal" | "transmission" | "circuit";
 
+/**
+ * Games 1–4 of the Project Hail Mary set, in order, on the four gated codes:
+ *   QR 02 Identify the Alien Intruder · QR 04 Decode the Alien Signal
+ *   QR 06 Decode the Corrupted Transmission · QR 08 Repair the Energy Circuit
+ */
 export const MINIGAME_QRS: Record<number, MinigameType> = {
-  2: "sliding",
-  4: "memory",
-  6: "sequence",
-  8: "maze",
+  2: "intruder",
+  4: "signal",
+  6: "transmission",
+  8: "circuit",
 };
 
 /** QR 1,3,5,7,9 = instant piece. */
