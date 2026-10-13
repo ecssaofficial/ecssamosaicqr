@@ -47,13 +47,6 @@ const MAZES: string[][] = [
   ],
 ];
 
-const DIRECTIONS: Record<string, [number, number]> = {
-  up: [-1, 0],
-  down: [1, 0],
-  left: [0, -1],
-  right: [0, 1],
-};
-
 type Cell = { row: number; col: number };
 
 export default function MazeGame({
@@ -112,8 +105,8 @@ export default function MazeGame({
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-dim">
-          REACH THE GREEN CELL
+        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/45">
+          REACH THE MARKED CELL
         </p>
         <TerminalButton
           className="px-2 py-1 text-[9px]"
@@ -135,15 +128,15 @@ export default function MazeGame({
                 type="button"
                 onClick={() => tapCell(row, col)}
                 aria-label={isWall ? "wall" : `cell ${row} ${col}`}
-                // flat blocks: wall = panel block, open = space block,
-                // goal = solid green, player = solid cyan
-                className={`touch-manipulation border ${
+                // flat monochrome blocks: wall = lifted panel, open = black,
+                // goal = faint white target, player = solid white square
+                className={`touch-manipulation select-none border ${
                   isWall
-                    ? "border-panel bg-panel"
+                    ? "border-white/10 bg-panel"
                     : isGoal
-                      ? "border-ink bg-ink"
-                      : "border-dim bg-space"
-                } ${isPlayer ? "border-primary bg-primary shadow-[0_0_18px_rgba(34,211,238,0.5)]" : ""}`}
+                      ? "border-white/45 bg-white/10"
+                      : "border-white/10 bg-space"
+                } ${isPlayer ? "border-ink bg-ink" : ""}`}
               />
             );
           }),
@@ -183,7 +176,7 @@ export default function MazeGame({
             →
           </TerminalButton>
         </div>
-        <p className="text-[9px] uppercase tracking-[0.25em] text-dim">
+        <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/25">
           TAP OR USE ARROWS
         </p>
       </div>

@@ -66,7 +66,7 @@ export default function SlidingPuzzle({ onWin }: { onWin: () => void }) {
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-dim">
+        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/45">
           SLIDE THE TILES INTO PLACE
         </p>
         <TerminalButton
@@ -81,7 +81,7 @@ export default function SlidingPuzzle({ onWin }: { onWin: () => void }) {
         {tiles
           ? tiles.map((tile, slot) =>
               tile === BLANK ? (
-                <div key="blank" />
+                <div key="blank" className="border border-dashed border-white/10" />
               ) : (
                 <motion.button
                   key={tile}
@@ -89,7 +89,7 @@ export default function SlidingPuzzle({ onWin }: { onWin: () => void }) {
                   type="button"
                   onClick={() => move(slot)}
                   aria-label={`tile ${tile + 1}`}
-                  className="touch-manipulation border border-dim"
+                  className="touch-manipulation border border-white/25"
                   style={{
                     gridRow: Math.floor(slot / SIZE) + 1,
                     gridColumn: (slot % SIZE) + 1,
@@ -98,6 +98,7 @@ export default function SlidingPuzzle({ onWin }: { onWin: () => void }) {
                     backgroundPosition: `${(tile % SIZE) * 50}% ${
                       Math.floor(tile / SIZE) * 50
                     }%`,
+                    filter: "grayscale(1) contrast(1.1)",
                   }}
                 />
               ),

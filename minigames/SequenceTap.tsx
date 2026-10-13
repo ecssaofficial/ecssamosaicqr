@@ -90,7 +90,7 @@ export default function SequenceTap({ onWin }: { onWin: () => void }) {
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-dim">
+        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/45">
           {active ? "REPEAT THE SEQUENCE" : "WATCH THE SEQUENCE"}
         </p>
         <TerminalButton
@@ -108,11 +108,11 @@ export default function SequenceTap({ onWin }: { onWin: () => void }) {
             type="button"
             onClick={() => tap(pad)}
             aria-label={`pad ${pad + 1}`}
-            // a lit pad is a solid cyan block, an idle pad is a dark cell
+            // a lit pad is a solid white block, an idle pad is a black cell
             className={`touch-manipulation border transition-colors duration-100 ${
               lit === pad
-                ? "border-primary bg-primary shadow-[0_0_28px_rgba(34,211,238,0.45)]"
-                : "border-dim bg-space"
+                ? "border-ink bg-ink"
+                : "border-white/10 bg-space"
             }`}
           />
         ))}
@@ -123,12 +123,12 @@ export default function SequenceTap({ onWin }: { onWin: () => void }) {
           {Array.from({ length: LENGTH }, (_, i) => (
             <span
               key={i}
-              className={`h-1.5 w-6 ${i < step ? "bg-primary" : "bg-dim"}`}
+              className={`h-1.5 w-6 ${i < step ? "bg-ink" : "bg-white/10"}`}
             />
           ))}
         </div>
         {failed ? (
-          <p className="text-[10px] uppercase tracking-[0.25em] text-danger">
+          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-danger">
             SIGNAL LOST
           </p>
         ) : null}

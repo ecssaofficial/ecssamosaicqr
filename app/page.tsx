@@ -26,12 +26,14 @@ import {
 } from "@/lib/supabase";
 
 const EXPORT_SIZE = 1000;
-const EXPORT_QR_SIZE = 760;
+const EXPORT_QR_SIZE = 840;
 
-const SHEET_FONT = "'Space Grotesk', system-ui, sans-serif";
-
-/** Prints one QR: white modules on navy, thin cyan frame, "QR 01" caption. */
-function renderQrSheet(qrCanvas: HTMLCanvasElement, id: number, origin: string) {
+/**
+ * Downloads the code and nothing else: white ground, black modules, 8% quiet
+ * zone — no frame, no caption, no URL, so it prints and scans anywhere and
+ * can be handed to an external QR generator unchanged.
+ */
+function renderQrPng(qrCanvas: HTMLCanvasElement, id: number) {
   const canvas = document.createElement("canvas");
   canvas.width = EXPORT_SIZE;
   canvas.height = EXPORT_SIZE;
@@ -39,42 +41,12 @@ function renderQrSheet(qrCanvas: HTMLCanvasElement, id: number, origin: string) 
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  ctx.fillStyle = "#0B1220";
+  ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, EXPORT_SIZE, EXPORT_SIZE);
 
-  ctx.strokeStyle = "#22D3EE";
-  ctx.lineWidth = 3;
-  ctx.strokeRect(25, 25, EXPORT_SIZE - 50, EXPORT_SIZE - 50);
-
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  ctx.fillStyle = "#22D3EE";
-  const captionCtx = ctx as CanvasRenderingContext2D & { letterSpacing?: string };
-  if ("letterSpacing" in captionCtx) captionCtx.letterSpacing = "14px";
-  ctx.font = `600 66px ${SHEET_FONT}`;
-  ctx.fillText(`QR ${label(id)}`, EXPORT_SIZE / 2, 112);
-  if ("letterSpacing" in captionCtx) captionCtx.letterSpacing = "0px";
-
-  const qrBox = EXPORT_QR_SIZE;
-  const qrY = 190;
+  const inset = Math.round((EXPORT_SIZE - EXPORT_QR_SIZE) / 2);
   ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(qrCanvas, (EXPORT_SIZE - qrBox) / 2, qrY, qrBox, qrBox);
-
-  const game = minigameFor(id);
-  ctx.fillStyle = "#64748B";
-  ctx.font = `400 30px ${SHEET_FONT}`;
-  if ("letterSpacing" in captionCtx) captionCtx.letterSpacing = "6px";
-  ctx.fillText(
-    game ? `MINIGAME: ${game.toUpperCase()}` : "DIRECT PIECE",
-    EXPORT_SIZE / 2,
-    190 + qrBox + 62,
-  );
-  if ("letterSpacing" in captionCtx) captionCtx.letterSpacing = "0px";
-
-  ctx.fillStyle = "#64748B";
-  ctx.font = `300 22px ${SHEET_FONT}`;
-  ctx.fillText(`${origin}${qrPath(id)}`, EXPORT_SIZE / 2, EXPORT_SIZE - 68);
+  ctx.drawImage(qrCanvas, inset, inset, EXPORT_QR_SIZE, EXPORT_QR_SIZE);
 
   canvas.toBlob((blob) => {
     if (!blob) return;
@@ -112,13 +84,13 @@ export default function AdminPage() {
   }, [refresh]);
 
   // The hidden QR canvas only exists while an export is pending; once the
-  // browser has painted it we compose the print sheet and save it.
+  // browser has painted it we save it as the PNG.
   useEffect(() => {
     if (exportId === null || !origin) return;
     const canvas = exportHostRef.current?.querySelector("canvas");
     setExportId(null);
     if (!canvas) return;
-    renderQrSheet(canvas, exportId, origin);
+    renderQrPng(canvas, exportId);
   }, [exportId, origin]);
 
   const earned = pieces?.filter((p) => p.earned).length ?? 0;
@@ -131,37 +103,36 @@ export default function AdminPage() {
     setBusy(false);
   }
 
+  /** PIECES 03/09 · SESSION 2026-10-13T12:40 · LINK: OK */
+  const statusHead = [
+    `PIECES ${label(earned)}/${label(TOTAL_PIECES)}`,
+    `SESSION ${stamp ? formatStamp(stamp) : "—"}`,
+  ].join(" · ");
+
   return (
     <SpaceBg>
-      <header className="flex flex-wrap items-end justify-between gap-3 px-6 pt-6">
-        <div>
-          <h1 className="text-2xl uppercase tracking-[0.4em] text-ink">
-            ORBIT // CONTROL
-          </h1>
-          <p className="mt-1 text-[10px] uppercase tracking-[0.4em] text-dim">
-            STAGE 01
-          </p>
-        </div>
-        <p
-          className={`text-[10px] uppercase tracking-[0.3em] ${
-            isSupabaseConfigured ? "text-success" : "text-danger"
-          }`}
-        >
-          {dataSourceLabel()}
+      <header className="border-b border-white/10 px-6 pb-4 pt-6">
+        <h1 className="text-2xl uppercase tracking-[0.35em] text-ink">
+          ORBIT // CONTROL
+        </h1>
+        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.25em] text-white/45">
+          {statusHead} ·{" "}
+          {/* red only when the link is broken — status semantics, thin usage */}
+          <span className={isSupabaseConfigured ? "text-white/45" : "text-danger"}>
+            {dataSourceLabel()}
+          </span>
         </p>
       </header>
 
       <main className="grid flex-1 gap-6 p-6 lg:grid-cols-2">
-        <Panel label="GAME CONTROL" className="h-fit">
-          <div className="border border-dim bg-space px-5 py-6">
-            <p className="text-[10px] uppercase tracking-[0.35em] text-dim">
-              PIECES
+        <Panel label="GAME CONTROL" headerRight="LIVE" className="h-fit">
+          <div className="border border-white/15 bg-space px-5 py-6">
+            <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/45">
+              PIECES EARNED
             </p>
-            <p className="mt-2 text-4xl tracking-[0.12em] text-ink">
-              {pieces ? `${earned} / ${TOTAL_PIECES}` : `— / ${TOTAL_PIECES}`}
-              <span className="ml-3 text-sm tracking-[0.35em] text-dim">
-                EARNED
-              </span>
+            <p className="mt-2 font-mono text-4xl leading-none tracking-[0.1em] text-ink">
+              {pieces ? label(earned) : "—"}
+              <span className="text-white/25">/{label(TOTAL_PIECES)}</span>
             </p>
           </div>
 
@@ -180,13 +151,16 @@ export default function AdminPage() {
             </TerminalButton>
           </div>
 
-          <dl className="mt-6 space-y-2 border-t border-dim pt-4 text-[10px] uppercase tracking-[0.3em] text-dim">
+          <dl className="mt-6 border-t border-white/10 pt-4 font-mono text-[10px] uppercase tracking-[0.3em]">
             {ALL_PIECE_IDS.map((id) => (
-              <div key={id} className="flex items-center justify-between">
-                <dt>PIECE {label(id)}</dt>
+              <div
+                key={id}
+                className="flex items-center justify-between border-b border-white/10 py-2 last:border-b-0"
+              >
+                <dt className="text-white/45">PIECE {label(id)}</dt>
                 <dd
                   className={
-                    pieces?.[id - 1]?.earned ? "text-success" : "text-dim"
+                    pieces?.[id - 1]?.earned ? "text-ink" : "text-white/25"
                   }
                 >
                   {pieces?.[id - 1]?.earned ? "ACTIVE" : "IDLE"}
@@ -196,45 +170,40 @@ export default function AdminPage() {
           </dl>
         </Panel>
 
-        <Panel label="QR CODES" className="h-fit">
+        <Panel label="QR CODES" headerRight="3×3" className="h-fit">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {ALL_PIECE_IDS.map((id) => {
               const game = minigameFor(id);
               return (
                 <div
                   key={id}
-                  className="flex flex-col items-center border border-dim bg-space p-3"
+                  className="flex flex-col items-center border border-white/15 bg-space p-3"
                 >
-                  <p className="w-full text-[10px] uppercase tracking-[0.3em] text-ink">
-                    QR {label(id)}
-                  </p>
-                  <div className="mt-3 flex h-[96px] w-[96px] items-center justify-center bg-panel">
+                  <div className="mt-1 flex h-[96px] w-[96px] items-center justify-center border border-white/10">
                     {origin ? (
                       <QRCodeCanvas
                         value={`${origin}${qrPath(id)}`}
-                        size={96}
+                        size={94}
                         level="M"
                         marginSize={1}
-                        bgColor="#0B1220"
-                        fgColor="#FFFFFF"
+                        bgColor="#000000"
+                        fgColor="#F5F5F5"
                       />
                     ) : (
-                      <span className="h-2 w-2 bg-primary animate-blink" />
+                      <span className="h-2 w-2 bg-ink animate-blink" />
                     )}
                   </div>
-                  <p
-                    className={`mt-3 w-full text-[9px] uppercase tracking-[0.25em] ${
-                      game ? "text-secondary" : "text-dim"
-                    }`}
-                  >
-                    {game ? `GAME: ${game.toUpperCase()}` : "DIRECT"}
+                  <p className="mt-3 w-full text-center font-mono text-[9px] uppercase tracking-[0.2em] text-white/45">
+                    QR {label(id)} // {game ? game.toUpperCase() : "DIRECT"}
                   </p>
                   <TerminalButton
-                    className="mt-3 w-full px-2 py-1 text-[9px]"
+                    className="mt-3 h-7 w-7 px-0 py-0 text-[12px]"
                     onClick={() => setExportId(id)}
                     disabled={!origin}
+                    aria-label={`Download QR ${label(id)} as PNG`}
+                    title="DOWNLOAD PNG"
                   >
-                    PNG
+                    ↓
                   </TerminalButton>
                 </div>
               );
@@ -242,10 +211,6 @@ export default function AdminPage() {
           </div>
         </Panel>
       </main>
-
-      <footer className="px-6 pb-6 pt-2 text-[10px] uppercase tracking-[0.3em] text-dim">
-        SESSION: {stamp ? formatStamp(stamp) : "—"}
-      </footer>
 
       {exportId !== null && origin ? (
         <div
@@ -264,8 +229,8 @@ export default function AdminPage() {
             size={EXPORT_QR_SIZE}
             level="M"
             marginSize={2}
-            bgColor="#0B1220"
-            fgColor="#FFFFFF"
+            bgColor="#FFFFFF"
+            fgColor="#000000"
           />
         </div>
       ) : null}

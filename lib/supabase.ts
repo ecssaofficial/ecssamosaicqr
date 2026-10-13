@@ -187,9 +187,8 @@ export function subscribePieces(onChange: () => void): () => void {
   };
 }
 
-/** Debug breadcrumb for the admin panel. */
+/** Link segment of the admin status line. Red semantics only via the
+ *  caller: "LOCAL" means phones will not sync. */
 export function dataSourceLabel(): string {
-  return isSupabaseConfigured
-    ? "STATUS: SUPABASE LINKED"
-    : "STATUS: LOCAL DEV MODE — SET SUPABASE ENV";
+  return isSupabaseConfigured ? "LINK: OK" : "LINK: LOCAL";
 }

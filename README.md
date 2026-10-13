@@ -64,10 +64,10 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key
 ```
 
-The admin page shows `STATUS: SUPABASE LINKED` in green when they are wired
+The admin status line shows `LINK: OK` when they are wired
 up. If they are missing the app still runs, but **only across tabs on one
 machine** (localStorage + BroadcastChannel) — phones will not sync. That mode
-is for development only and the admin header warns about it in red.
+is for development only and the status line shows `LINK: LOCAL` in red.
 
 ---
 
@@ -138,18 +138,16 @@ solve than flat/blurry ones.
 ## 5. Printing the QR codes
 
 1. Open `/` on the final host URL.
-2. Each of the 9 cells shows the code and its badge — `GAME: SLIDING` for
-   QR 2/4/6/8, `DIRECT` for the rest.
-3. Click **PNG** → a `orbit-qr-0n.png` (1000×1000, print-ready: white code on
-   navy with a cyan frame and a `QR 01` caption) is downloaded.
+2. Each of the 9 cells shows a mono caption — `QR 02 // SLIDING` for
+   QR 2/4/6/8, `QR 01 // DIRECT` for the rest.
+3. Click the **↓** button → a `orbit-qr-0n.png` (1000×1000, print-ready:
+   black modules on white with an 8% quiet zone) is downloaded.
 4. Print all 9 at ≥8 cm and scatter them. Players scan them with the phone
    camera — no app needed.
 
-> The codes are inverted (light modules on dark) to match the design. Every
-> current iOS/Android camera reads these fine. If you meet a device that
-> struggles, print on white instead: set `bgColor="#FFFFFF"` and
-> `fgColor="#0B1220"` on the two `QRCodeCanvas` elements in
-> [`app/page.tsx`](app/page.tsx).
+> The codes shown *on screen* are inverted (light modules on black) to match
+> the cockpit design; the PNG export is always standard black-on-white so it
+> prints and scans anywhere. Every current iOS/Android camera reads both.
 
 ---
 
@@ -187,7 +185,7 @@ the page in a private tab).
 
 ```
 app/layout.tsx          fonts, viewport, global styles
-app/globals.css         design tokens, glow utilities, square-corner rule
+app/globals.css         monochrome tokens, square-corner rule, piece filter
 app/page.tsx            admin  (/)
 app/stage/page.tsx      laptop stage  (/stage)
 app/qr/[id]/page.tsx    phone claim page  (/qr/1…9)

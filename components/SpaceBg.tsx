@@ -2,16 +2,18 @@ import type { ReactNode } from "react";
 import { mulberry32 } from "@/lib/jigsaw";
 
 /**
- * Shared base wrapper: flat #050810 space plus a sparse static starfield.
- * Dots are solid white 1–2px points — no tinted or faded variants — placed
- * from a seeded PRNG so server and client render the same sky.
+ * Shared base wrapper: flat #000000 with a sparse static starfield.
+ * 35 white dots at 15–35% opacity, placed once from a seeded PRNG so the
+ * server and client render the same sky. Instruments do not twinkle —
+ * there is no animation on this layer.
  */
 const STARS = (() => {
   const rnd = mulberry32(20261013);
-  return Array.from({ length: 60 }, () => ({
+  return Array.from({ length: 35 }, () => ({
     left: Number((rnd() * 100).toFixed(3)),
     top: Number((rnd() * 100).toFixed(3)),
     size: rnd() > 0.7 ? 2 : 1,
+    opacity: Number((0.15 + rnd() * 0.2).toFixed(2)),
   }));
 })();
 
@@ -37,7 +39,8 @@ export default function SpaceBg({
               top: `${star.top}%`,
               width: star.size,
               height: star.size,
-              backgroundColor: "#ffffff",
+              backgroundColor: "#FFFFFF",
+              opacity: star.opacity,
             }}
           />
         ))}

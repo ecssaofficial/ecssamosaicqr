@@ -1,16 +1,19 @@
 import type { Config } from "tailwindcss";
 
 /**
- * ORBIT colour rules:
+ * ORBIT — monochrome spacecraft cockpit.
  *
- *  1. FLAT PALETTE ONLY. Black, white and the space palette below are the
- *     only colours in the UI — no tints, no shades, no alpha-modified
- *     fills/borders/text. Every surface is one of these solid values.
- *  2. NO GRADIENTS, anywhere. The gradient utilities are pinned to `none`
- *     below so a gradient cannot render even if one is written by mistake.
- *  3. SQUARE CORNERS ONLY. Every radius utility resolves to 0.
- *  4. Alpha is allowed in exactly one place: soft glow shadows (an effect,
- *     not a colour fill) — see the glow utilities in globals.css.
+ * PALETTE (strictly monochrome):
+ *   #000000 background · #0A0A0A panel surface
+ *   #F5F5F5 primary text / inverted surface · #FFFFFF white for structure
+ *   Hairlines are white at low alpha (10 / 15 / 25 / 35 / 45%)
+ *   #FF3B30 red is the ONLY hue, and only for locked / error / wrong-slot.
+ *
+ * RULES:
+ *   1. No gradients anywhere (none are configured, none are used).
+ *   2. No coloured shadows or glows — depth comes from borders and tone.
+ *   3. Square corners only: every radius utility resolves to 0.
+ *   4. Hierarchy comes from size, weight and opacity — never colour.
  */
 const config: Config = {
   content: [
@@ -21,29 +24,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        space: "#050810", // flat space background
-        panel: "#0B1220", // panel / box background
-        primary: "#22D3EE", // cyan
-        secondary: "#8B5CF6", // violet
-        success: "#22C55E", // green
-        danger: "#EF4444", // red
-        ink: "#E2E8F0", // primary text
-        dim: "#64748B", // secondary text / quiet structure
-        cleared: "#052E16", // win-screen background
+        space: "#000000", // cockpit background
+        panel: "#0A0A0A", // instrument faceplate surface
+        ink: "#F5F5F5", // primary text + inverted surfaces
+        danger: "#FF3B30", // locked / error only
       },
       fontFamily: {
         sans: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
+        mono: ["var(--font-ibm-plex-mono)", "ui-monospace", "monospace"],
       },
-      // gradients are never allowed — every gradient utility renders nothing
-      backgroundImage: {
-        "gradient-to-t": "none",
-        "gradient-to-tr": "none",
-        "gradient-to-r": "none",
-        "gradient-to-br": "none",
-        "gradient-to-b": "none",
-        "gradient-to-bl": "none",
-        "gradient-to-l": "none",
-        "gradient-to-tl": "none",
+      transitionDuration: {
+        150: "150ms",
       },
     },
     // SQUARE CORNERS ONLY — every radius utility resolves to 0.

@@ -112,12 +112,12 @@ export function writeSessionStamp(at: Date = new Date()): string {
   return iso;
 }
 
-/** Human readable stamp for the footer. */
+/** Compact technical stamp for the admin status line: 2026-10-13T12:40. */
 export function formatStamp(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
   const p = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(
     d.getHours(),
-  )}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  )}:${p(d.getMinutes())}`;
 }

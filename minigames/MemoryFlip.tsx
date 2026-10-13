@@ -79,7 +79,7 @@ export default function MemoryFlip({ onWin }: { onWin: () => void }) {
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-dim">
+        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/45">
           MATCH EVERY PAIR
         </p>
         <TerminalButton className="px-2 py-1 text-[9px]" onClick={reset}>
@@ -97,15 +97,15 @@ export default function MemoryFlip({ onWin }: { onWin: () => void }) {
                   key={card.key}
                   type="button"
                   onClick={() => flip(i)}
-                  // flat states: dim border = face down (glyph painted in the
-                  // panel colour so it is invisible), cyan = revealed,
-                  // green = matched
-                  className={`flex touch-manipulation items-center justify-center border text-2xl sm:text-3xl ${
+                  // flat states, white only: face down = glyph painted in the
+                  // black so it is invisible, open = white glyph, matched =
+                  // settled back down to a dim outline
+                  className={`flex touch-manipulation items-center justify-center border font-mono text-2xl sm:text-3xl ${
                     isMatched
-                      ? "border-success text-success"
+                      ? "border-white/10 bg-panel text-white/25"
                       : isOpen
-                        ? "border-primary text-primary"
-                        : "border-dim bg-panel text-panel"
+                        ? "border-white/45 bg-space text-ink"
+                        : "border-white/15 bg-space text-space"
                   }`}
                 >
                   {card.glyph}

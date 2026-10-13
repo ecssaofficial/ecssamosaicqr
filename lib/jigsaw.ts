@@ -170,8 +170,10 @@ export function getPieceSVG(index: number, size: number, uid = ""): string {
     `<g clip-path="url(#${clipId})">`,
     `<image href="${siteUrl(PUZZLE_IMAGE)}" x="${fmt(-col)}" y="${fmt(-row)}" width="${GRID}" height="${GRID}" preserveAspectRatio="none"/>`,
     `</g>`,
-    // flat cyan hairline: outlines the piece and covers clip seams
-    `<path d="${d}" fill="none" stroke="#22D3EE" stroke-width="0.005"/>`,
+    // flat hairline outline (currentColor): white/40 at rest, solid white
+    // while dragging, red for one beat on a wrong drop — and it covers
+    // the clip seams.
+    `<path d="${d}" fill="none" stroke="currentColor" stroke-width="0.01"/>`,
     `</svg>`,
   ].join("");
 }

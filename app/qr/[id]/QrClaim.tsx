@@ -34,8 +34,10 @@ const GAME_LABEL: Record<MinigameType, string> = {
 function Blink({ text }: { text: string }) {
   return (
     <div className="flex flex-col items-center gap-4">
-      <span className="h-3 w-3 bg-primary animate-blink" />
-      <p className="text-[10px] uppercase tracking-[0.35em] text-dim">{text}</p>
+      <span className="h-3 w-3 bg-ink animate-blink" />
+      <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/45">
+        {text}
+      </p>
     </div>
   );
 }
@@ -102,10 +104,10 @@ export default function QrClaim({ id }: { id: string }) {
               <span className="flex h-20 w-20 items-center justify-center border border-danger text-4xl text-danger">
                 ✕
               </span>
-              <p className="text-[10px] uppercase tracking-[0.35em] text-danger">
+              <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-danger">
                 STATUS: UNKNOWN CODE
               </p>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-dim">
+              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/25">
                 USE ONE OF THE 9 PRINTED CODES
               </p>
             </div>
@@ -113,31 +115,35 @@ export default function QrClaim({ id }: { id: string }) {
 
           {view === "locked" ? (
             <div className="flex flex-col items-center gap-5 text-center">
-              <p className="text-[10px] uppercase tracking-[0.35em] text-danger">
+              <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-danger">
                 STATUS: CLAIMED
               </p>
-              <span className="flex h-24 w-24 items-center justify-center border border-danger text-5xl text-danger">
+              <span className="flex h-24 w-24 items-center justify-center border border-white/25 text-5xl text-ink">
                 ✕
               </span>
-              <p className="text-sm uppercase tracking-[0.3em] text-ink">
+              <p className="font-mono text-sm uppercase tracking-[0.3em] text-ink">
                 PIECE ALREADY ACTIVE
               </p>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-dim">
+              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/25">
                 PLEASE CLOSE THIS TAB
               </p>
             </div>
           ) : null}
 
           {view === "success" ? (
-            // two lines only — verified, then the action
-            <div className="flex flex-col items-center gap-8 text-center">
-              <span className="flex h-24 w-24 items-center justify-center border border-success text-5xl text-success glow-green">
+            // verified: small status line, inverted check badge, then the
+            // action — black on white, three lines, nothing else
+            <div className="flex flex-col items-center gap-6 text-center">
+              <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-ink">
+                STATUS: VERIFIED
+              </p>
+              <span className="flex h-24 w-24 items-center justify-center bg-ink text-5xl leading-none text-space">
                 ✓
               </span>
-              <p className="text-[clamp(1.05rem,5vw,1.7rem)] uppercase leading-tight tracking-[0.2em] text-success text-glow-green">
-                QR {label(qrId)} VERIFIED
+              <p className="font-mono text-[clamp(0.95rem,4.5vw,1.25rem)] uppercase leading-tight tracking-[0.2em] text-ink">
+                QR {label(qrId)} // PIECE TRANSMITTED
               </p>
-              <p className="text-[clamp(0.9rem,4vw,1.3rem)] uppercase leading-tight tracking-[0.2em] text-dim">
+              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/25">
                 PLEASE CLOSE THIS TAB
               </p>
             </div>
@@ -145,7 +151,7 @@ export default function QrClaim({ id }: { id: string }) {
 
           {view === "minigame" && game ? (
             <div className="w-full">
-              <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-secondary">
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-white/45">
                 {GAME_LABEL[game]} // SOLVE TO UNLOCK PIECE {label(qrId)}
               </p>
               {game === "sliding" ? <SlidingPuzzle onWin={claim} /> : null}
