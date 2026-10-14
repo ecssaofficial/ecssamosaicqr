@@ -21,19 +21,31 @@ import TerminalButton from "@/components/TerminalButton";
 
 const SENTENCES = [
   "THE CREW DETECTED AN UNUSUAL SIGNAL",
-  "GRACE TRAVELS ALONE TOWARD ALPHA CENTAURI",
-  "ROCKY CALLS THE SHIP THE HAIL MARY",
-  "ASTROPHAGE HARNESS THE HEAT OF STARS",
-  "THE BEAT KEEPS THE ENGINE ALIVE",
-  "STRATT TRUSTS SCIENCE OVER EVERY FEAR",
-  "TAUMOEBA SURVIVE IN THE OPEN VOID",
-  "ONE LIFE CAN SAVE ALL MANKIND",
+  "THE SHIP IS LOST IN SPACE",
+  "WE MUST FIND OUR WAY HOME",
+  "THE STAR IS BIG AND BRIGHT",
+  "A NEW WORLD IS OUT THERE",
+  "THE ENGINE IS DEAD AND COLD",
+  "ONE MAN CAN SAVE US ALL",
+  "THE SUN WILL RISE AGAIN",
 ];
 
-const HINTS = [
-  "The transmission describes an event involving the spaceship crew.",
-  "The final sentence begins with \"THE\" and ends with \"SIGNAL\".",
-];
+/** Hints per stage: the third one is the answer itself. */
+function wordHints(word: string, index: number, total: number): string[] {
+  return [
+    `WORD ${index + 1} OF ${total} — ${word.length} LETTERS, STARTS WITH "${word[0]}".`,
+    `THE LETTERS ARE: ${[...word].sort().join(" · ")}`,
+    `ANSWER: ${word}`,
+  ];
+}
+
+function sentenceHints(words: string[], sentence: string): string[] {
+  return [
+    `THE SENTENCE HAS ${words.length} WORDS.`,
+    `IT STARTS WITH "${words[0]}" AND ENDS WITH "${words[words.length - 1]}".`,
+    `ANSWER: ${sentence}`,
+  ];
+}
 
 type Tone = "idle" | "danger" | "ok";
 type Deal = {
@@ -120,6 +132,20 @@ export default function Transmission({ onWin }: { onWin: () => void }) {
   const { sentence, words, scrambles, pool } = deal;
   const scrambled = scrambles[activeIdx];
   const targetLen = words[activeIdx].length;
+
+  /* Hints describe whatever is on screen right now: the active word while
+     decoding, the whole sentence once every word is decoded. */
+  const hints =
+    stage === 1
+      ? wordHints(words[activeIdx], activeIdx, words.length)
+      : sentenceHints(words, sentence);
+  const hintCount = hints.length;
+
+  /* Each word (and the sentence) gets its own run of hints, so the third
+     one always reveals the answer to whatever is currently being solved. */
+  useEffect(() => {
+    setHintsUsed(0);
+  }, [activeIdx, stage]);
 
   /* ---------- Stage 1: auto-check as soon as the word is full ---------- */
   useEffect(() => {
@@ -331,8 +357,11 @@ export default function Transmission({ onWin }: { onWin: () => void }) {
             <TerminalButton className="py-3 text-[10px]" onClick={() => setTyped([])}>
               CLEAR
             </TerminalButton>
-            <TerminalButton className="py-3 text-[10px]" onClick={() => setHintsUsed((n) => Math.min(n + 1, HINTS.length))}>
-              HINT ({hintsUsed}/{HINTS.length})
+            <TerminalButton
+              className="py-3 text-[10px]"
+              onClick={() => setHintsUsed((n) => Math.min(n + 1, hintCount))}
+            >
+              HINT ({hintsUsed}/{hintCount})
             </TerminalButton>
           </div>
         </>
@@ -371,9 +400,20 @@ export default function Transmission({ onWin }: { onWin: () => void }) {
             ))}
           </div>
 
-          <TerminalButton className="w-full py-3" onClick={() => setSlots(pool.map(() => null))}>
-            RESET ORDER
-          </TerminalButton>
+          <div className="grid grid-cols-2 gap-2">
+            <TerminalButton
+              className="py-3 text-[10px]"
+              onClick={() => setSlots(pool.map(() => null))}
+            >
+              RESET ORDER
+            </TerminalButton>
+            <TerminalButton
+              className="py-3 text-[10px]"
+              onClick={() => setHintsUsed((n) => Math.min(n + 1, hintCount))}
+            >
+              HINT ({hintsUsed}/{hintCount})
+            </TerminalButton>
+          </div>
         </>
       )}
 
@@ -382,12 +422,26 @@ export default function Transmission({ onWin }: { onWin: () => void }) {
       </p>
 
       {hintsUsed > 0 ? (
-        <div className="border border-white/25 bg-space p-2.5">
-          <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/45">
-            TRANSMISSION HINT ({hintsUsed}/{HINTS.length})
+        <div
+          className={`border p-2.5 transition-colors duration-150 ${
+            hintsUsed >= hintCount
+              ? "border-ink bg-ink"
+              : "border-white/25 bg-space"
+          }`}
+        >
+          <p
+            className={`font-mono text-[9px] uppercase tracking-[0.25em] ${
+              hintsUsed >= hintCount ? "text-space/60" : "text-white/45"
+            }`}
+          >
+            TRANSMISSION HINT ({hintsUsed}/{hintCount})
           </p>
-          <p className="mt-1.5 text-[11px] leading-relaxed text-ink">
-            {HINTS[Math.min(hintsUsed - 1, HINTS.length - 1)]}
+          <p
+            className={`mt-1.5 font-mono text-[11px] leading-relaxed tracking-[0.12em] ${
+              hintsUsed >= hintCount ? "font-bold text-space" : "text-ink"
+            }`}
+          >
+            {hints[Math.min(hintsUsed - 1, hintCount - 1)]}
           </p>
         </div>
       ) : null}
