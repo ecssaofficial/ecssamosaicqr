@@ -439,6 +439,15 @@ export default function StagePage() {
           >
             PROCEED TO NEXT STAGE
           </motion.p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.65, duration: 0.2 }}
+            aria-live="polite"
+            className="mt-8 max-w-md border-t border-space/20 pt-6 text-center font-mono text-[11px] uppercase leading-relaxed tracking-[0.28em] text-space/80 sm:text-xs"
+          >
+            All fragments recovered. Proceed to the Engineering bay
+          </motion.p>
         </div>
       ) : null}
     </SpaceBg>

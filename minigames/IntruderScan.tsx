@@ -26,20 +26,22 @@ type Params = {
   tilt: number;
 };
 
-/** What the five matching objects look like. */
-const BASE: Params = {
-  spikes: 8,
-  dot: "center",
-  border: "solid",
-  core: "diamond",
-  tilt: 0,
-};
+/**
+ * Each level deals nine objects: eight are byte-for-byte identical and one
+ * deviates in exactly one property. `tilt` is randomised but never the
+ * deviating property — a tilt-only change is invisible on a symmetric glyph,
+ * so every level is guaranteed to have a findable intruder.
+ */
+const IDS = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+const LEVELS = 3;
 
-/** The intruder: object D — the dot is displaced to the top-right. */
-const ODD_ID = "D";
-const ODD: Params = { ...BASE, dot: "tr" };
+const SPIKES = [6, 8, 12];
+const DOTS: Dot[] = ["center", "tl", "tr", "bl", "br"];
+const BORDERS: BorderKind[] = ["solid", "dashed", "dotted", "double"];
+const CORES: Core[] = ["diamond", "square", "cross"];
+const TILTS = [0, 90, 180, 270];
+const DEVIATIONS = ["spikes", "dot", "border", "core"] as const;
 
-const IDS = ["A", "B", "C", "D", "E", "F"];
 const DOT_OFFSET = 9;
 const DOT_POS: Record<Dot, [number, number]> = {
   center: [0, 0],
@@ -56,6 +58,41 @@ function shuffle(input: readonly string[]): string[] {
     [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
+}
+
+type Level = { base: Params; odd: Params; oddId: string; order: string[] };
+
+function pick<T>(input: readonly T[]): T {
+  return input[Math.floor(Math.random() * input.length)];
+}
+
+/** Nine objects: eight identical, one deviating in exactly one property. */
+function dealLevel(): Level {
+  const base: Params = {
+    spikes: pick(SPIKES),
+    dot: pick(DOTS),
+    border: pick(BORDERS),
+    core: pick(CORES),
+    tilt: pick(TILTS),
+  };
+  const odd: Params = { ...base };
+
+  switch (pick(DEVIATIONS)) {
+    case "spikes":
+      odd.spikes = pick(SPIKES.filter((s) => s !== base.spikes));
+      break;
+    case "dot":
+      odd.dot = pick(DOTS.filter((d) => d !== base.dot));
+      break;
+    case "border":
+      odd.border = pick(BORDERS.filter((b) => b !== base.border));
+      break;
+    case "core":
+      odd.core = pick(CORES.filter((c) => c !== base.core));
+      break;
+  }
+
+  return { base, odd, oddId: pick(IDS), order: shuffle(IDS) };
 }
 
 /** One scanned object, drawn entirely in currentColor so it takes the cell's tone. */
@@ -154,7 +191,8 @@ function Glyph({ params }: { params: Params }) {
 }
 
 export default function IntruderScan({ onWin }: { onWin: () => void }) {
-  const [order, setOrder] = useState<string[]>(() => shuffle(IDS));
+  const [level, setLevel] = useState<number>(0);
+  const [deal, setDeal] = useState<Level>(() => dealLevel());
   const [selected, setSelected] = useState<string | null>(null);
   const [solved, setSolved] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -180,7 +218,7 @@ export default function IntruderScan({ onWin }: { onWin: () => void }) {
       return;
     }
 
-    if (selected !== ODD_ID) {
+    if (selected !== deal.oddId) {
       setFailed(true);
       setSelected(null);
       setStatus("SCAN INCONCLUSIVE — TRY AGAIN");
@@ -188,19 +226,28 @@ export default function IntruderScan({ onWin }: { onWin: () => void }) {
       return;
     }
 
+    // Correct: flash the reveal, then either the next scan or the win.
     setSolved(true);
     setSelected(null);
     setStatus("ANOMALY IDENTIFIED");
+
     later(() => {
       if (declared.current) return;
-      declared.current = true;
-      onWin();
-    }, 600);
+      if (level + 1 >= LEVELS) {
+        declared.current = true;
+        onWin();
+        return;
+      }
+      setLevel((n) => n + 1);
+      setDeal(dealLevel());
+      setSolved(false);
+      setStatus("SELECT AN OBJECT TO SCAN.");
+    }, 700);
   }
 
   function reset() {
     if (solved) return;
-    setOrder(shuffle(IDS));
+    setDeal(dealLevel());
     setSelected(null);
     setStatus("SELECT AN OBJECT TO SCAN.");
   }
@@ -220,13 +267,24 @@ export default function IntruderScan({ onWin }: { onWin: () => void }) {
         </TerminalButton>
       </div>
 
+      <div className="flex gap-1">
+        {Array.from({ length: LEVELS }, (_, i) => (
+          <span
+            key={i}
+            className={`h-1 flex-1 transition-colors duration-150 ${
+              i < level || solved ? "bg-ink" : "bg-white/10"
+            }`}
+          />
+        ))}
+      </div>
+
       <div
-        className={`grid grid-cols-3 grid-rows-2 gap-2 border p-2 transition-colors duration-150 ${
+        className={`grid grid-cols-3 gap-2 border p-2 transition-colors duration-150 ${
           failed ? "border-danger" : "border-white/15"
         }`}
       >
-        {order.map((id) => {
-          const isOdd = id === ODD_ID;
+        {deal.order.map((id) => {
+          const isOdd = id === deal.oddId;
           const tone = solved
             ? isOdd
               ? "border-ink bg-ink text-space"
@@ -245,9 +303,9 @@ export default function IntruderScan({ onWin }: { onWin: () => void }) {
               disabled={solved}
               aria-label={`object ${id}`}
               aria-pressed={selected === id}
-              className={`aspect-square touch-manipulation border p-3 transition-colors duration-150 disabled:cursor-default ${tone}`}
+              className={`aspect-square touch-manipulation border p-2 transition-colors duration-150 disabled:cursor-default sm:p-3 ${tone}`}
             >
-              <Glyph params={isOdd ? ODD : BASE} />
+              <Glyph params={isOdd ? deal.odd : deal.base} />
             </button>
           );
         })}
@@ -270,6 +328,10 @@ export default function IntruderScan({ onWin }: { onWin: () => void }) {
       >
         CONFIRM ANOMALY
       </TerminalButton>
+
+      <p className="text-center font-mono text-[9px] uppercase tracking-[0.3em] text-white/25">
+        SCAN {String(level + 1).padStart(2, "0")} / {String(LEVELS).padStart(2, "0")}
+      </p>
     </div>
   );
 }
